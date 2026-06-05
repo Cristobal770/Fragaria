@@ -143,7 +143,7 @@
                     <div class="perfume-marca">{{ $perfume->marca->nombre }}</div>
                     <div class="perfume-nombre">{{ $perfume->nombre }}</div>
                 </div>
-                <a href="#" class="btn-detalle">Ver detalle</a>
+                <a href="{{ route('perfume.detalle', $perfume->id) }}" class="btn-detalle">Ver detalle</a>
             </div>
 
             <span class="perfume-badge">{{ $perfume->categoria->nombre }}</span>

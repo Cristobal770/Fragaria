@@ -16,5 +16,14 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+    Route::get('/perfume/{id}', [Fragaria::class, 'detalle'])->name('perfume.detalle');
+
+    Route::post('/perfume/{id}/resena', [Fragaria::class, 'guardarResena'])->name('resena.guardar');
+
+    Route::put('/resena/{id}', [Fragaria::class, 'actualizarResena'])->name('resena.actualizar');
+
+    Route::delete('/resena/{id}', [Fragaria::class, 'eliminarResena'])->name('resena.eliminar');
+
+
     
 });
