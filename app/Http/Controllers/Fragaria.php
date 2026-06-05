@@ -3,13 +3,14 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
+use App\Models\perfume;
 
 class Fragaria extends Controller
 {
     public function inicio()
     {
-        return view('inicio');
+        $perfumes = perfume::with(['marca', 'categoria'])->get();
+        return view('inicio', compact('perfumes'));
     }
 
 }

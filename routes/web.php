@@ -14,5 +14,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/', [Fragaria::class, 'inicio'])->name('fra.inicio');
 
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
     
 });
