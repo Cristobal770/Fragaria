@@ -2,9 +2,16 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Marca extends Model
 {
-    protected $table = 'marcas';
+    use HasFactory;
+
+    protected $guarded = [];
+
+    public function perfumes() {
+        return $this->hasMany(Perfume::class);
+    }
 }

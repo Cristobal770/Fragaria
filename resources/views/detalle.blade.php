@@ -1,440 +1,394 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $perfume->nombre }} - Fragaria</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+@extends('layouts.menu')
 
-        body {
-            background-color: #f0f0f0;
-            color: #111;
-            min-height: 100vh;
-            padding: 30px;
-        }
+@section('page-title', $perfume->nombre)
 
-        .back-link {
-            display: inline-block;
-            margin-bottom: 20px;
-            font-size: 13px;
-            color: #555;
-            text-decoration: none;
-        }
+@section('content')
+<style>
+    .detalle-container {
+        padding: 20px;
+        max-width: 1100px;
+        margin: 0 auto;
+        color: #333;
+    }
 
-        .back-link:hover {
-            text-decoration: underline;
-        }
+    .perfume-header {
+        display: flex;
+        background: white;
+        border-radius: 12px;
+        border: 1px solid #e5e5e5;
+        padding: 25px;
+        gap: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+    }
 
-        /* ── CARD PRINCIPAL ── */
-        .perfume-detail-card {
-            background: white;
-            border-radius: 12px;
-            border: 1px solid #e0e0e0;
-            padding: 25px;
-            display: flex;
-            gap: 30px;
-            max-width: 750px;
-            margin: 0 auto;
-        }
+    .perfume-header img {
+        width: 280px;
+        height: 320px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 1px solid #eee;
+    }
 
-        .perfume-detail-card img {
-            width: 180px;
-            min-width: 180px;
-            height: 220px;
-            object-fit: cover;
-            border-radius: 8px;
-        }
+    .placeholder-img-large {
+        width: 280px;
+        height: 320px;
+        background-color: #f0f0f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #aaa;
+        border-radius: 8px;
+    }
 
-        .perfume-detail-info {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
+    .perfume-info-full {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
 
-        .perfume-detail-nombre {
-            font-size: 26px;
-            font-weight: 700;
-            color: #111;
-        }
+    .perfume-info-full h1 {
+        font-size: 32px;
+        margin: 0 0 5px 0;
+        color: #111;
+    }
 
-        .perfume-detail-sub {
-            font-size: 13px;
-            color: #888;
-        }
+    .perfume-subtitle {
+        font-size: 15px;
+        color: #666;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eee;
+    }
 
-        .perfume-detail-desc {
-            font-size: 13px;
-            color: #555;
-            line-height: 1.5;
-        }
+    .perfume-subtitle strong {
+        color: #111;
+    }
 
-        .perfume-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 5px;
-        }
+    .perfume-description {
+        font-size: 16px;
+        line-height: 1.6;
+        color: #444;
+        margin-bottom: 25px;
+        flex-grow: 1;
+    }
 
-        .stat-box {
-            background-color: #f9f9f9;
-            border: 1px solid #eee;
-            border-radius: 8px;
-            padding: 12px 15px;
-        }
+    .stats-container {
+        display: flex;
+        gap: 15px;
+    }
 
-        .stat-label {
-            font-size: 11px;
-            color: #999;
-            margin-bottom: 4px;
-        }
+    .stat-box {
+        background: #fafafa;
+        border: 1px solid #eee;
+        padding: 15px 20px;
+        border-radius: 8px;
+        text-align: center;
+        flex: 1;
+    }
 
-        .stat-value {
-            font-size: 15px;
-            font-weight: 600;
-            color: #111;
-        }
+    .stat-value {
+        display: block;
+        font-size: 20px;
+        font-weight: bold;
+        color: #111;
+        margin-bottom: 4px;
+    }
 
-        .stat-value .estrella {
-            color: #f5a623;
-        }
+    .stat-value.estrellas {
+        color: #f5a623;
+    }
 
+    .stat-label {
+        font-size: 12px;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
 
-            .content-wrapper {
-            max-width: 750px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
+    .reviews-layout {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+    }
 
-        /* ── MI RESEÑA ── */
-        .mi-resena-card {
-            background: white;
-            border-radius: 12px;
-            border: 1px solid #e0e0e0;
-            padding: 20px 25px;
-        }
+    .review-panel {
+        background: white;
+        border-radius: 12px;
+        border: 1px solid #e5e5e5;
+        padding: 25px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+    }
 
-        .mi-resena-card h3 {
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 15px;
-        }
+    .panel-title {
+        font-size: 20px;
+        margin-top: 0;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #111;
+        display: inline-block;
+    }
 
-        /* formulario estrellas */
-        .stars-input {
-            display: flex;
-            flex-direction: row-reverse;
-            justify-content: flex-end;
-            gap: 4px;
-            margin-bottom: 12px;
-        }
+    .form-group {
+        margin-bottom: 15px;
+    }
 
-        .stars-input input { display: none; }
+    .form-group label {
+        display: block;
+        font-size: 13px;
+        font-weight: bold;
+        margin-bottom: 6px;
+        color: #111;
+    }
 
-        .stars-input label {
-            font-size: 28px;
-            color: #ddd;
-            cursor: pointer;
-        }
+    .form-control {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 14px;
+        box-sizing: border-box;
+        transition: border-color 0.3s;
+    }
 
-        .stars-input input:checked ~ label,
-        .stars-input label:hover,
-        .stars-input label:hover ~ label {
-            color: #f5a623;
-        }
+    .form-control:focus {
+        border-color: #111;
+        outline: none;
+    }
 
-        .form-group {
-            margin-bottom: 12px;
-        }
+    .btn-submit {
+        background: #111;
+        color: white;
+        border: none;
+        padding: 12px;
+        width: 100%;
+        border-radius: 6px;
+        font-size: 15px;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 10px;
+        transition: background 0.3s;
+    }
 
-        .form-group label {
-            display: block;
-            font-size: 12px;
-            color: #888;
-            margin-bottom: 4px;
-        }
+    .btn-submit:hover {
+        background: #333;
+    }
 
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
-            width: 100%;
-            padding: 8px 10px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 13px;
-            color: #333;
-            outline: none;
-            background: #fafafa;
-        }
+    .btn-delete {
+        background: none;
+        border: none;
+        color: #d93025;
+        font-size: 13px;
+        text-decoration: underline;
+        width: 100%;
+        text-align: center;
+        margin-top: 15px;
+        cursor: pointer;
+    }
 
-        .form-group textarea { resize: vertical; min-height: 80px; }
+    .alert-login {
+        background: #fff8e1;
+        border: 1px solid #ffecb3;
+        color: #856404;
+        padding: 15px;
+        border-radius: 8px;
+        text-align: center;
+        font-size: 14px;
+    }
 
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
+    .alert-login a {
+        color: #856404;
+        font-weight: bold;
+    }
 
-        .btn-publicar {
-            background-color: #111;
-            color: white;
-            border: none;
-            padding: 9px 20px;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 5px;
-        }
+    .community-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
 
-        .btn-publicar:hover { background-color: #333; }
+    .review-card {
+        background: #fafafa;
+        border: 1px solid #eee;
+        padding: 15px;
+        border-radius: 8px;
+    }
 
-        /* reseña ya publicada */
-        .resena-publicada-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 8px;
-        }
+    .review-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+    }
 
-        .resena-nickname { font-size: 13px; font-weight: 700; }
-        .resena-fecha    { font-size: 12px; color: #888; margin-top: 2px; }
-        .resena-estrellas { color: #f5a623; font-size: 15px; }
+    .review-user {
+        font-weight: bold;
+        font-size: 14px;
+        color: #111;
+    }
 
-        .resena-comentario { font-size: 13px; color: #333; margin: 8px 0; }
+    .review-date {
+        font-size: 12px;
+        color: #888;
+    }
 
-        .resena-meta {
-            font-size: 12px;
-            color: #666;
-            display: flex;
-            gap: 20px;
-            margin-bottom: 12px;
-        }
+    .review-meta {
+        font-size: 13px;
+        color: #666;
+        margin-bottom: 8px;
+    }
 
-        .resena-acciones { display: flex; gap: 8px; }
+    .review-meta .estrellas {
+        color: #f5a623;
+        margin-right: 8px;
+    }
 
-        .btn-editar {
-            background-color: #111;
-            color: white;
-            border: none;
-            padding: 7px 14px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-        }
+    .review-text {
+        font-size: 14px;
+        color: #444;
+        font-style: italic;
+        margin: 0;
+        line-height: 1.5;
+    }
 
-        .btn-eliminar {
-            background-color: #e53935;
-            color: white;
-            border: none;
-            padding: 7px 14px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-        }
+    @media (max-width: 768px) {
+        .perfume-header { flex-direction: column; }
+        .perfume-header img { width: 100%; height: auto; }
+        .reviews-layout { grid-template-columns: 1fr; }
+        .stats-container { flex-direction: column; }
+    }
+</style>
 
-        /* ── RESEÑAS OTROS ── */
-        .resenas-titulo {
-            font-size: 18px;
-            font-weight: 700;
-            color: #111;
-        }
+<div class="detalle-container">
+    
+    <a href="{{ route('fra.inicio') }}" style="color: #666; text-decoration: none; font-size: 14px; margin-bottom: 15px; display: inline-block;">
+        ← Volver al catálogo
+    </a>
 
-        .resena-card {
-            background: white;
-            border-radius: 10px;
-            border: 1px solid #e0e0e0;
-            padding: 18px 22px;
-        }
-    </style>
-</head>
-<body>
-    <a href="{{ route('fra.inicio') }}" class="back-link">← Volver al catálogo</a>
+    <div class="perfume-header">
+        @if($perfume->imagen)
+            <img src="{{ asset($perfume->imagen) }}" alt="{{ $perfume->nombre }}">
+        @else
+            <div class="placeholder-img-large">Sin imagen</div>
+        @endif
 
-    <div class="content-wrapper">
+        <div class="perfume-info-full">
+            <h1>{{ $perfume->nombre }}</h1>
+            <div class="perfume-subtitle">
+                <strong>{{ $perfume->marca->nombre }}</strong> | Familia Olfativa: {{ $perfume->categoria->nombre }}
+            </div>
+            
+            <div class="perfume-description">
+                {{ $perfume->descripcion }}
+            </div>
 
-        {{-- CARD PERFUME --}}
-        <div class="perfume-detail-card">
-            @if($perfume->imagen)
-                <img src="{{ asset('img/' . $perfume->imagen) }}" alt="{{ $perfume->nombre }}">
-            @else
-                <div style="width:180px;min-width:180px;height:220px;background:#f0f0f0;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#aaa;font-size:12px;">Sin imagen</div>
-            @endif
-
-            <div class="perfume-detail-info">
-                <div class="perfume-detail-nombre">{{ $perfume->marca->nombre }} {{ $perfume->nombre }}</div>
-                <div class="perfume-detail-sub">{{ $perfume->marca->nombre }} • {{ $perfume->categoria->nombre }}</div>
-                <div class="perfume-detail-desc">{{ $perfume->descripcion }}</div>
-                <div class="perfume-stats">
-                    <div class="stat-box">
-                        <div class="stat-label">Duración promedio</div>
-                        <div class="stat-value">{{ $perfume->duracion_promedio > 0 ? $perfume->duracion_promedio . ' horas' : 'Sin datos' }}</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-label">Proyección</div>
-                        <div class="stat-value">{{ ucfirst($perfume->proyeccion_promedio) }}</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-label">Calificación</div>
-                        <div class="stat-value">
-                            {{ $perfume->calificacion_promedio > 0 ? number_format($perfume->calificacion_promedio, 1) . ' / 5' : 'Sin datos' }}
-                            @if($perfume->calificacion_promedio > 0)<span class="estrella">★</span>@endif
-                        </div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-label">Total reseñas</div>
-                        <div class="stat-value">{{ $perfume->total_resenas }} reseñas</div>
-                    </div>
+            <div class="stats-container">
+                <div class="stat-box">
+                    <span class="stat-value estrellas">
+                        @for($i = 1; $i <= 5; $i++)
+                            {{ $i <= round($perfume->calificacion_promedio) ? '★' : '☆' }}
+                        @endfor
+                        ({{ $perfume->calificacion_promedio }})
+                    </span>
+                    <span class="stat-label">Basado en {{ $perfume->total_resenas }} reseñas</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-value">{{ $perfume->duracion_promedio > 0 ? $perfume->duracion_promedio . ' Hrs' : '--' }}</span>
+                    <span class="stat-label">Duración Promedio</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-value">{{ ucfirst($perfume->proyeccion) }}</span>
+                    <span class="stat-label">Proyección</span>
                 </div>
             </div>
         </div>
+    </div>
 
-        {{-- MI RESEÑA --}}
-        <div class="mi-resena-card">
-            <h3>Tu reseña</h3>
+    <div class="reviews-layout">
 
-                @if($miResena)
-        @if(request('editar') == 1)
-            <form action="{{ route('resena.actualizar', $miResena->id) }}" method="POST">
-                @csrf
-                @method('PUT')
-                <div class="form-group">
-                    <label>Calificación</label>
-                    <div class="stars-input">
-                        @for($i = 5; $i >= 1; $i--)
-                            <input type="radio" name="calificacion" id="star{{ $i }}" value="{{ $i }}"
-                                {{ $miResena->calificacion == $i ? 'checked' : '' }} required>
-                            <label for="star{{ $i }}">★</label>
-                        @endfor
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Comentario</label>
-                    <textarea name="comentario" required>{{ $miResena->comentario }}</textarea>
-                </div>
-                <div class="form-row">
+        <div class="review-panel">
+            <h2 class="panel-title">{{ $userResena ? 'Edita tu reseña' : 'Deja tu reseña' }}</h2>
+            
+            @auth
+                <form action="{{ $userResena ? route('resena.actualizar', $userResena->id) : route('resena.guardar', $perfume->id) }}" method="POST">
+                    @csrf
+                    @if($userResena)
+                        @method('PUT')
+                    @endif
+
                     <div class="form-group">
-                        <label>Duración (horas)</label>
-                        <input type="number" name="duracion" min="1" max="48" value="{{ $miResena->duracion }}" required>
+                        <label>Calificación (1 a 5 estrellas) *</label>
+                        <input type="number" name="calificacion" min="1" max="5" value="{{ old('calificacion', $userResena->calificacion ?? '') }}" class="form-control" placeholder="Ej: 5" required>
                     </div>
+                    
                     <div class="form-group">
-                        <label>Proyección</label>
-                        <select name="proyeccion" required>
-                            <option value="leve"     {{ $miResena->proyeccion == 'leve'     ? 'selected' : '' }}>Leve</option>
-                            <option value="moderado" {{ $miResena->proyeccion == 'moderado' ? 'selected' : '' }}>Moderado</option>
-                            <option value="intenso"  {{ $miResena->proyeccion == 'intenso'  ? 'selected' : '' }}>Intenso</option>
+                        <label>Duración percibida (Horas) *</label>
+                        <input type="number" name="duracion" min="1" value="{{ old('duracion', $userResena->duracion ?? '') }}" class="form-control" placeholder="Ej: 8" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Proyección *</label>
+                        <select name="proyeccion" class="form-control" required>
+                            <option value="">Selecciona una opción...</option>
+                            <option value="leve" {{ (old('proyeccion', $userResena->proyeccion ?? '') == 'leve') ? 'selected' : '' }}>Leve</option>
+                            <option value="moderado" {{ (old('proyeccion', $userResena->proyeccion ?? '') == 'moderado') ? 'selected' : '' }}>Moderada</option>
+                            <option value="intenso" {{ (old('proyeccion', $userResena->proyeccion ?? '') == 'intenso') ? 'selected' : '' }}>Intensa</option>
                         </select>
                     </div>
-                </div>
-                <div style="display:flex; gap:8px; margin-top:5px;">
-                    <button type="submit" class="btn-publicar">Actualizar reseña</button>
-                    <a href="{{ route('perfume.detalle', $perfume->id) }}" class="btn-editar" style="text-decoration:none; padding: 9px 20px;">Cancelar</a>
-                </div>
-            </form>
-        @else
-            <div class="resena-publicada-header">
-                <div>
-                    <div class="resena-nickname">@ {{ Auth::user()->nickname }}</div>
-                    <div class="resena-fecha">{{ \Carbon\Carbon::parse($miResena->fecha_publicacion)->translatedFormat('d F Y') }}</div>
-                </div>
-                <div class="resena-estrellas">
-                    @for($i = 1; $i <= 5; $i++){{ $i <= $miResena->calificacion ? '★' : '☆' }}@endfor
-                </div>
-            </div>
-            <div class="resena-comentario">{{ $miResena->comentario }}</div>
-            <div class="resena-meta">
-                <span>Duración: {{ $miResena->duracion }} horas</span>
-                <span>Proyección: {{ ucfirst($miResena->proyeccion) }}</span>
-            </div>
-            <div class="resena-acciones">
-                <a href="{{ route('perfume.detalle', $perfume->id) }}?editar=1" class="btn-editar" style="text-decoration:none; padding: 7px 14px;">Editar reseña</a>
-                <form action="{{ route('resena.eliminar', $miResena->id) }}" method="POST" style="display:inline;">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn-eliminar">Eliminar reseña</button>
-                </form>
-            </div>
-        @endif
-            @else
-                {{-- FORMULARIO NUEVA RESEÑA --}}
-                @if($errors->any())
-                    <div style="background:#fff0f0;color:#cc0000;border:1px solid #ffcccc;padding:10px;border-radius:6px;margin-bottom:15px;font-size:13px;">
-                        {{ $errors->first() }}
+
+                    <div class="form-group">
+                        <label>Comentario *</label>
+                        <textarea name="comentario" rows="4" class="form-control" placeholder="Cuéntanos qué te pareció este perfume..." required>{{ old('comentario', $userResena->comentario ?? '') }}</textarea>
                     </div>
+
+                    <button type="submit" class="btn-submit">
+                        {{ $userResena ? 'Actualizar Reseña' : 'Publicar Reseña' }}
+                    </button>
+                </form>
+
+                @if($userResena)
+                    <form action="{{ route('resena.eliminar', $userResena->id) }}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn-delete" onclick="return confirm('¿Estás seguro de eliminar tu reseña?');">Eliminar mi reseña</button>
+                    </form>
                 @endif
-
-                <form action="{{ route('resena.guardar', $perfume->id) }}" method="POST">
-                    @csrf
-
-                    <div class="form-group">
-                        <label>Calificación</label>
-                        <div class="stars-input">
-                            @for($i = 5; $i >= 1; $i--)
-                                <input type="radio" name="calificacion" id="star{{ $i }}" value="{{ $i }}" {{ old('calificacion') == $i ? 'checked' : '' }} required>
-                                <label for="star{{ $i }}">★</label>
-                            @endfor
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Comentario</label>
-                        <textarea name="comentario" placeholder="Escribe tu opinión sobre este perfume..." required>{{ old('comentario') }}</textarea>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Duración (horas)</label>
-                            <input type="number" name="duracion" min="1" max="48" placeholder="ej: 8" value="{{ old('duracion') }}" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Proyección</label>
-                            <select name="proyeccion" required>
-                                <option value="" disabled selected>Seleccionar...</option>
-                                <option value="leve"     {{ old('proyeccion') == 'leve'     ? 'selected' : '' }}>Leve</option>
-                                <option value="moderado" {{ old('proyeccion') == 'moderado' ? 'selected' : '' }}>Moderado</option>
-                                <option value="intenso"  {{ old('proyeccion') == 'intenso'  ? 'selected' : '' }}>Intenso</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="btn-publicar">Publicar reseña</button>
-                </form>
-            @endif
+            @else
+                <div class="alert-login">
+                    Para poder publicar o editar una reseña, necesitas <br><br>
+                    <a href="{{ route('login') }}">Iniciar Sesión</a> o <a href="{{ route('registro') }}">Registrarte</a>
+                </div>
+            @endauth
         </div>
 
-        {{-- RESEÑAS DE OTROS USUARIOS --}}
-        @if($resenas->count() > 0)
-            <div class="resenas-titulo">Reseñas de usuarios</div>
-            @foreach($resenas as $resena)
-                <div class="resena-card">
-                    <div class="resena-publicada-header">
-                        <div>
-                            <div class="resena-nickname">@ {{ $resena->user->nickname }}</div>
-                            <div class="resena-fecha">{{ \Carbon\Carbon::parse($resena->fecha_publicacion)->translatedFormat('d F Y') }}</div>
+        <div class="review-panel">
+            <h2 class="panel-title">Comunidad ({{ $perfume->total_resenas }})</h2>
+            
+            <div class="community-list">
+                @forelse($perfume->resenas as $resena)
+                    <div class="review-card">
+                        <div class="review-header">
+                            <span class="review-user">👤 {{ $resena->user->nickname }}</span>
+                            <span class="review-date">{{ $resena->created_at->diffForHumans() }}</span>
                         </div>
-                        <div class="resena-estrellas">
-                            @for($i = 1; $i <= 5; $i++){{ $i <= $resena->calificacion ? '★' : '☆' }}@endfor
+                        <div class="review-meta">
+                            <span class="estrellas">
+                                @for($i = 1; $i <= 5; $i++)
+                                    {{ $i <= $resena->calificacion ? '★' : '☆' }}
+                                @endfor
+                            </span>
+                            <span>({{ $resena->duracion }} hrs | {{ ucfirst($resena->proyeccion) }})</span>
                         </div>
+                        <p class="review-text">"{{ $resena->comentario }}"</p>
                     </div>
-                    <div class="resena-comentario">{{ $resena->comentario }}</div>
-                    <div class="resena-meta">
-                        <span>Duración: {{ $resena->duracion }} horas</span>
-                        <span>Proyección: {{ ucfirst($resena->proyeccion) }}</span>
+                @empty
+                    <div class="review-card" style="text-align: center; color: #888;">
+                        <p>No hay reseñas aún. Sé el primero en opinar.</p>
                     </div>
-                </div>
-            @endforeach
-        @endif
+                @endforelse
+            </div>
+        </div>
 
     </div>
-</body>
-</html>
+</div>
+@endsection

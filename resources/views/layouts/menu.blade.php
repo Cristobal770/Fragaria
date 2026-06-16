@@ -20,7 +20,6 @@
             color: #111;
         }
 
-        /* ── SIDEBAR ── */
         .sidebar {
             width: 200px;
             min-width: 200px;
@@ -36,6 +35,11 @@
             font-size: 20px;
             font-weight: 700;
             color: #111;
+        }
+
+        .sidebar-brand a {
+            text-decoration: none;
+            color: inherit;
         }
 
         .sidebar-user {
@@ -97,7 +101,6 @@
             accent-color: #111;
         }
 
-        /* empuja el botón de cerrar sesión al fondo */
         .sidebar-spacer {
             flex-grow: 1;
         }
@@ -149,60 +152,89 @@
             height: 1px;
             background-color: #e5e5e5;
         }
+
+        .form-filters {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            flex-grow: 1;
+        }
     </style>
 </head>
 <body>
 
-    {{-- SIDEBAR --}}
     <aside class="sidebar">
-        <div class="sidebar-brand">Fragaria</div>
-
-        <div class="sidebar-divider"></div>
-
-        <div class="sidebar-user">
-            <div class="nickname">@ {{ Auth::user()->nickname }}</div>
-            <div class="fullname">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</div>
-        </div>
-
-        <div class="sidebar-search">
-            <input type="text" placeholder="Buscar...">
+        <div class="sidebar-brand">
+            <a href="{{ route('fra.inicio') }}">Fragaria</a>
         </div>
 
         <div class="sidebar-divider"></div>
 
-        <div>
-            <div class="sidebar-section-title">Filtrar por marca</div>
-            <div class="sidebar-filters">
-                <label><input type="radio" name="marca" checked> Todas</label>
-                <label><input type="radio" name="marca"> Dior</label>
-                <label><input type="radio" name="marca"> Versace</label>
-                <label><input type="radio" name="marca"> Carolina Herrera</label>
-                <label><input type="radio" name="marca"> Yves saint laurent</label>
+        @auth
+            <div class="sidebar-user">
+                <div class="nickname">@ {{ Auth::user()->nickname }}</div>
+                <div class="fullname">{{ Auth::user()->nombres }} {{ Auth::user()->apellidos }}</div>
             </div>
-        </div>
-
-        <div class="sidebar-divider"></div>
-
-        <div>
-            <div class="sidebar-section-title">Filtrar por categoría</div>
-            <div class="sidebar-filters">
-                <label><input type="radio" name="cat" checked> Todas</label>
-                <label><input type="radio" name="cat"> Amaderado</label>
-                <label><input type="radio" name="cat"> Oriental</label>
-                <label><input type="radio" name="cat"> Citrico</label>
-                <label><input type="radio" name="cat"> Dulce</label>
+        @else
+            <div class="sidebar-user">
+                <div class="nickname">Modo Invitado</div>
+                <div class="fullname"><a href="{{ route('login') }}" style="color: #1a73e8; text-decoration: none;">Iniciar sesión</a></div>
             </div>
-        </div>
+        @endauth
 
-        <div class="sidebar-spacer"></div>
+        <form action="{{ route('fra.inicio') }}" method="GET" class="form-filters">
+            
+            <div class="sidebar-search">
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Buscar perfume..." onchange="this.form.submit()">
+            </div>
 
-        <form action="{{ route('logout') }}" method="POST">
-            @csrf
-            <button type="submit" class="logout-btn">Cerrar sesión</button>
+            <div class="sidebar-divider"></div>
+
+            <div>
+                <div class="sidebar-section-title">Filtrar por marca</div>
+                <div class="sidebar-filters">
+                    <label>
+                        <input type="radio" name="marca_id" value="" {{ request('marca_id') == '' ? 'checked' : '' }} onchange="this.form.submit()"> 
+                        Todas
+                    </label>
+                    @foreach(\App\Models\Marca::all() as $marca)
+                        <label>
+                            <input type="radio" name="marca_id" value="{{ $marca->id }}" {{ request('marca_id') == $marca->id ? 'checked' : '' }} onchange="this.form.submit()"> 
+                            {{ $marca->nombre }}
+                        </label>
+                    @endforeach
+                </div>
+            </div>
+
+            <div class="sidebar-divider"></div>
+
+            <div>
+                <div class="sidebar-section-title">Filtrar por categoría</div>
+                <div class="sidebar-filters">
+                    <label>
+                        <input type="radio" name="categoria_id" value="" {{ request('categoria_id') == '' ? 'checked' : '' }} onchange="this.form.submit()"> 
+                        Todas
+                    </label>
+                    @foreach(\App\Models\Categoria::all() as $categoria)
+                        <label>
+                            <input type="radio" name="categoria_id" value="{{ $categoria->id }}" {{ request('categoria_id') == $categoria->id ? 'checked' : '' }} onchange="this.form.submit()"> 
+                            {{ $categoria->nombre }}
+                        </label>
+                    @endforeach
+                </div>
+            </div>
+
+            <div class="sidebar-spacer"></div>
         </form>
+
+        @auth
+            <form action="{{ route('logout') }}" method="POST">
+                @csrf
+                <button type="submit" class="logout-btn">Cerrar sesión</button>
+            </form>
+        @endauth
     </aside>
 
-    {{-- CONTENIDO PRINCIPAL --}}
     <main class="main">
         <div class="main-header">
             <h1>@yield('page-title', 'Inicio')</h1>

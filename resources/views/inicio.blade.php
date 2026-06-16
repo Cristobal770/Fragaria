@@ -132,7 +132,7 @@
     <div class="perfume-card">
 
         @if($perfume->imagen)
-            <img src="{{ asset('img/' . $perfume->imagen) }}" alt="{{ $perfume->nombre }}">
+            <img src="{{ asset($perfume->imagen) }}" alt="{{ $perfume->nombre }}">
         @else
             <div class="placeholder-img">Sin imagen</div>
         @endif
@@ -154,8 +154,8 @@
                 Duración: <span>{{ $perfume->duracion_promedio > 0 ? $perfume->duracion_promedio . ' horas' : 'Sin datos' }}</span>
             </div>
             <div class="perfume-datos">
-                Proyección: <span class="proyeccion-{{ $perfume->proyeccion_promedio }}">
-                    {{ ucfirst($perfume->proyeccion_promedio) }}
+                Proyección: <span class="proyeccion-{{ strtolower($perfume->proyeccion) }}">
+                    {{ $perfume->proyeccion }}
                 </span>
             </div>
 

@@ -3,107 +3,104 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\perfume;
+use App\Models\Perfume;
+use App\Models\Marca;
+use App\Models\Categoria;
 use App\Models\Resena;
 use Illuminate\Support\Facades\Auth;
 
 class Fragaria extends Controller
 {
-    public function inicio()
+    public function inicio(Request $request)
     {
-        $perfumes = perfume::with(['marca', 'categoria'])->get();
-        return view('inicio', compact('perfumes'));
+        $query = Perfume::with(['marca', 'categoria', 'resenas']);
+
+        
+        if ($request->filled('search')) {
+            $query->where('nombre', 'like', '%' . $request->search . '%');
+        }
+
+        
+        if ($request->filled('marca_id')) {
+            $query->where('marca_id', $request->marca_id);
+        }
+
+        
+        if ($request->filled('categoria_id')) {
+            $query->where('categoria_id', $request->categoria_id);
+        }
+
+        $perfumes = $query->get();
+        $marcas = Marca::all();
+        $categorias = Categoria::all();
+
+        return view('inicio', compact('perfumes', 'marcas', 'categorias'));
     }
 
+    
     public function detalle($id)
     {
-        $perfume = perfume::with(['marca', 'categoria'])->findOrFail($id);
-        $miResena = Resena::where('perfume_id', $id)->where('user_id', Auth::id())->first();
-        $resenas  = Resena::with('user')->where('perfume_id', $id)->where('user_id', '!=', Auth::id())->latest('fecha_publicacion')->get();
-        return view('detalle', compact('perfume', 'miResena', 'resenas'));
+        
+        $perfume = Perfume::with(['marca', 'categoria', 'resenas.user'])->findOrFail($id);
+        
+        $userResena = null;
+        if (Auth::check()) {
+            $userResena = $perfume->resenas()->where('user_id', Auth::id())->first();
+        }
+
+        return view('detalle', compact('perfume', 'userResena'));
     }
 
+    
     public function guardarResena(Request $request, $id)
     {
         $request->validate([
-            'calificacion' => 'required|integer|between:1,5',
-            'comentario'   => 'required|string',
-            'duracion'     => 'required|integer|min:1',
-            'proyeccion'   => 'required|in:leve,moderado,intenso',
+            'calificacion' => 'required|integer|min:1|max:5',
+            'comentario' => 'required|string',
+            'duracion' => 'required|numeric|min:1',
+            'proyeccion' => 'required|in:leve,moderado,intenso',
         ]);
 
         Resena::create([
-            'perfume_id'        => $id,
-            'user_id'           => Auth::id(),
-            'calificacion'      => $request->calificacion,
-            'comentario'        => $request->comentario,
-            'duracion'          => $request->duracion,
-            'proyeccion'        => $request->proyeccion,
-            'fecha_publicacion' => now(),
+            'user_id' => Auth::id(),
+            'perfume_id' => $id,
+            'calificacion' => $request->calificacion,
+            'comentario' => $request->comentario,
+            'duracion' => $request->duracion,
+            'proyeccion' => $request->proyeccion,
         ]);
 
-        $this->recalcularPerfume($id);
-
-        return redirect()->route('perfume.detalle', $id);
+        return back()->with('success', 'Reseña publicada correctamente.');
     }
 
-
-    private function recalcularPerfume($perfume_id)
-    {
-        $resenas = Resena::where('perfume_id', $perfume_id)->get();
-
-        if ($resenas->count() === 0) return;
-
-        $duracion_promedio     = round($resenas->avg('duracion'), 1);
-        $calificacion_promedio = round($resenas->avg('calificacion'), 2);
-        $total_resenas         = $resenas->count();
-
-        $proyeccion_promedio = $resenas->groupBy('proyeccion')
-            ->map->count()
-            ->sortDesc()
-            ->keys()
-            ->first();
-
-        perfume::where('id', $perfume_id)->update([
-            'duracion_promedio'     => $duracion_promedio,
-            'calificacion_promedio' => $calificacion_promedio,
-            'proyeccion_promedio'   => $proyeccion_promedio,
-            'total_resenas'         => $total_resenas,
-        ]);
-    }
-
-
+    
     public function actualizarResena(Request $request, $id)
     {
         $request->validate([
-            'calificacion' => 'required|integer|between:1,5',
-            'comentario'   => 'required|string',
-            'duracion'     => 'required|integer|min:1',
-            'proyeccion'   => 'required|in:leve,moderado,intenso',
+            'calificacion' => 'required|integer|min:1|max:5',
+            'comentario' => 'required|string',
+            'duracion' => 'required|numeric|min:1',
+            'proyeccion' => 'required|in:leve,moderado,intenso',
         ]);
 
-        $resena = Resena::findOrFail($id);
+        $resena = Resena::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
+        
         $resena->update([
             'calificacion' => $request->calificacion,
-            'comentario'   => $request->comentario,
-            'duracion'     => $request->duracion,
-            'proyeccion'   => $request->proyeccion,
+            'comentario' => $request->comentario,
+            'duracion' => $request->duracion,
+            'proyeccion' => $request->proyeccion,
         ]);
 
-        $this->recalcularPerfume($resena->perfume_id);
-
-        return redirect()->route('perfume.detalle', $resena->perfume_id);
+        return back()->with('success', 'Reseña actualizada correctamente.');
     }
 
+    
     public function eliminarResena($id)
     {
-        $resena = Resena::findOrFail($id);
-        $perfume_id = $resena->perfume_id;
+        $resena = Resena::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
         $resena->delete();
 
-        $this->recalcularPerfume($perfume_id);
-
-        return redirect()->route('perfume.detalle', $perfume_id);
+        return back()->with('success', 'Reseña eliminada.');
     }
-
 }

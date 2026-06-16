@@ -2,24 +2,20 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Resena extends Model
 {
-    protected $table = 'resenas';
+    use HasFactory;
 
-    protected $fillable = [
-        'perfume_id',
-        'user_id',
-        'calificacion',
-        'comentario',
-        'duracion',
-        'proyeccion',
-        'fecha_publicacion',
-    ];
+    protected $guarded = [];
 
-    public function user()
-    {
+    public function user() {
         return $this->belongsTo(User::class);
+    }
+
+    public function perfume() {
+        return $this->belongsTo(Perfume::class);
     }
 }
